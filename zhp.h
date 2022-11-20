@@ -53,5 +53,5 @@ void http_error(int);
 void response_headers(char *);
 int fetch_page(char *, struct template *, struct page *);
 int read_template(struct template *);
-size_t str_replace(char **, size_t, char *, char *);
-size_t include_tag(char **, size_t, char *, char *);
+int str_replace(char **, size_t *, char *, char *);
+int include_tag(char **, size_t *, char *, char *);

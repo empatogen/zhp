@@ -55,17 +55,24 @@ main(void)
 	if (read_template(&t) == -1)
 		http_error(404);
 
-	t.size = include_tag(&t.data, t.size, "{{include('", "')}}");
+	if (include_tag(&t.data, &t.size, "{{include('", "')}}") == -1)
+		http_error(500);
 
-	str_replace(&t.data, t.size, "{{path}}", p.path);
-	str_replace(&t.data, t.size, "{{title}}", p.title);
-	str_replace(&t.data, t.size, "{{keywords}}", p.keywords);
-	str_replace(&t.data, t.size, "{{description}}", p.description);
-	str_replace(&t.data, t.size, "{{content}}", p.content);
+	if (str_replace(&t.data, &t.size, "{{path}}", p.path) == -1)
+		http_error(500);
+	if (str_replace(&t.data, &t.size, "{{title}}", p.title) == -1)
+		http_error(500);
+	if (str_replace(&t.data, &t.size, "{{keywords}}", p.keywords) == -1)
+		http_error(500);
+	if (str_replace(&t.data, &t.size, "{{description}}", p.description) == -1)
+		http_error(500);
+	if (str_replace(&t.data, &t.size, "{{content}}", p.content) == -1)
+		http_error(500);
 
 	memset(modified, 0, sizeof(modified));
 	http_date(p.modified, modified, sizeof(modified));
-	str_replace(&t.data, t.size, "{{modified}}", modified);
+	if (str_replace(&t.data, &t.size, "{{modified}}", modified) == -1)
+		http_error(500);
 
 	response_headers(modified);
 	if (strncmp(method, "HEAD", sizeof(method)) != 0)

@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sqlite3.h>
+#include <math.h>
 #include <time.h>
 
 #include <sys/types.h>
@@ -155,20 +156,28 @@ fetch_page(char *path, struct template *t, struct page *p)
 }
 
 
-size_t
-str_replace(char **source, size_t len, char *search, char *replace)
+int
+str_replace(char **source, size_t *len, char *search, char *replace)
 {
 	char *src;
 	size_t relen = strlen(replace);
 	size_t selen = strlen(search);
-	size_t solen = strlen(*source);
+	size_t solen;
+	int newlen;
+	int offset = 0;
 
-	while ((src = strstr(*source, search)) != NULL) {
-		if (len < solen + (relen - selen) + 1) {
-			len *= 2;
-			if ((*source = realloc(*source, len)) == NULL)
-				return 0;
-			src = strstr(*source, search);
+	while (true) {
+		if ((src = strstr(*source+offset, search)) == NULL)
+			break;
+		solen = strlen(*source);
+		if (*len < solen + (relen - selen) + 1) {
+			newlen = ceil((solen + (relen-selen) + 1) / 4096.0) * 4096;
+			if ((*source = realloc(*source, newlen)) == NULL) {
+				*len = 0;
+				return -1;
+			}
+			*len = newlen;
+			continue;
 		}
 		memmove(
 			src + relen,
@@ -176,9 +185,9 @@ str_replace(char **source, size_t len, char *search, char *replace)
 			(strlen(src) - selen) + 1
 		);
 		memcpy(src, replace, relen);
+		offset = (src - *source) + (relen - selen) + 1;
 	}
-
-	return len;
+	return 0;
 }
 
 
@@ -208,7 +217,7 @@ read_template(struct template *t)
 }
 
 
-size_t include_tag(char **body, size_t len, char *tag_start, char *tag_end)
+int include_tag(char **body, size_t *len, char *tag_start, char *tag_end)
 {
 	char *inc;
 	char tag[64];
@@ -224,18 +233,20 @@ size_t include_tag(char **body, size_t len, char *tag_start, char *tag_end)
 		tpl[i] = '\0';
 
 		if (snprintf(tag, sizeof(tag), "%s%s%s", tag_start, tpl, tag_end) == -1)
-			http_error(500);
+			return -1;
 		if (snprintf(t.file, sizeof(t.file), "tpls/%s", tpl) == -1)
-			http_error(500);
+			return -1;
 		if (read_template(&t) == -1) {
-			len = str_replace(&(*body), len, tag, "");
+			if (str_replace(&(*body), len, tag, "") == -1)
+				return -1;
 			continue;
 		}
 
-		len = str_replace(&(*body), len, tag, t.data);
+		str_replace(&(*body), len, tag, t.data);
 		free(t.data);
 	}
-	if (len == 0)
+	if (*len == 0)
 		http_error(500);
-	return len;
+
+	return 0;
 }
