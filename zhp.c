@@ -32,7 +32,7 @@ int cgi_path(char *path, int len)
 	if ((env = getenv("PATH_INFO")) == NULL)
 		return -1;
 
-	memcpy(path, env, strnlen(env, len));
+	snprintf(path, len, "%s", env);
 	return 0;
 }
 
@@ -44,7 +44,7 @@ int cgi_method(char *method, int len)
 	if ((env = getenv("REQUEST_METHOD")) == NULL)
 		return -1;
 
-	memcpy(method, env, strnlen(env, len));
+	snprintf(method, len, "%s", env);
 	return 0;
 }
 
