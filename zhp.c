@@ -158,7 +158,6 @@ str_replace(char **source, size_t len, char *search, char *replace)
 				return 0;
 			src = strstr(*source, search);
 		}
-
 		memmove(
 			src + relen,
 			src + selen,
@@ -212,14 +211,10 @@ size_t include_tag(char **body, size_t len, char *tag_start, char *tag_end)
 		}
 		tpl[i] = '\0';
 
-		if (snprintf(tag, sizeof(tag), "%s%s%s", tag_start, tpl, tag_end) == -1) {
-			len = str_replace(&(*body), len, tag, "");
-			continue;
-		}
-		if (snprintf(t.file, sizeof(t.file), "tpls/%s", tpl) == -1) {
-			len = str_replace(&(*body), len, tag, "");
-			continue;
-		}
+		if (snprintf(tag, sizeof(tag), "%s%s%s", tag_start, tpl, tag_end) == -1)
+			http_error(500);
+		if (snprintf(t.file, sizeof(t.file), "tpls/%s", tpl) == -1)
+			http_error(500);
 		if (read_template(&t) == -1) {
 			len = str_replace(&(*body), len, tag, "");
 			continue;
@@ -228,11 +223,7 @@ size_t include_tag(char **body, size_t len, char *tag_start, char *tag_end)
 		len = str_replace(&(*body), len, tag, t.data);
 		free(t.data);
 	}
-
-	if (len == 0) {
-		http_error(400);
-	}
+	if (len == 0)
+		http_error(500);
 	return len;
 }
-
-
