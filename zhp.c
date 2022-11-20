@@ -113,28 +113,18 @@ fetch_page(char *path, struct template *t, struct page *p)
 {
 	sqlite3 *db;
 	sqlite3_stmt *res;
-	int rc;
+
 	char *sql = "SELECT * FROM pages WHERE path=? LIMIT 1";
 
-	rc = sqlite3_open_v2("./main.db", &db,
-	  SQLITE_OPEN_READONLY | SQLITE_OPEN_SHAREDCACHE, NULL);
-	if (rc != SQLITE_OK) {
-		sqlite3_close(db);
-		return -1;
-	}
-
-	if (sqlite3_prepare_v2(db, sql, -1, &res, 0) != SQLITE_OK) {
-		sqlite3_close(db);
-		return -1;
-	}
-
-	if (sqlite3_bind_text(res, 1, path, -1, NULL) != SQLITE_OK) {
-		sqlite3_close(db);
-		return -1;
-	}
-
+	if (sqlite3_open_v2("./main.db", &db,
+	  SQLITE_OPEN_READONLY | SQLITE_OPEN_SHAREDCACHE, NULL) != SQLITE_OK)
+		goto fail;
+	if (sqlite3_prepare_v2(db, sql, -1, &res, 0) != SQLITE_OK)
+		goto fail;
+	if (sqlite3_bind_text(res, 1, path, -1, NULL) != SQLITE_OK)
+		goto fail;
 	if (sqlite3_step(res) != SQLITE_ROW)
-		return -1;
+		goto fail;
 
 	p->id = sqlite3_column_int(res, 0);
 	p->created = sqlite3_column_int(res, 1);
@@ -148,11 +138,14 @@ fetch_page(char *path, struct template *t, struct page *p)
 	snprintf(p->keywords, sizeof(p->keywords), "%s", sqlite3_column_text(res, 9));
 	snprintf(p->description, sizeof(p->description), "%s", sqlite3_column_text(res, 10));
 	snprintf(p->content, sizeof(p->content), "%s", sqlite3_column_text(res, 11));
-
 	sqlite3_finalize(res);
-	sqlite3_close(db);
 
+	sqlite3_close(db);
 	return snprintf(t->file, sizeof(t->file), "tpls/%s.tpl", p->template);
+
+	fail:
+	sqlite3_close(db);
+	return -1;
 }
 
 
