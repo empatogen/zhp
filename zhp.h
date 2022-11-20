@@ -48,6 +48,7 @@ size_t http_date(time_t, char *, size_t);
 
 int cgi_path(char *, int len);
 int cgi_method(char *, int len);
+int allowed_method(char *, int len);
 void http_error(int);
 void response_headers(char *);
 int fetch_page(char *, struct template *, struct page *);

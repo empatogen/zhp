@@ -46,6 +46,10 @@ main(void)
 		http_error(400);
 	if (cgi_method(method, sizeof(method)) == -1)
 		http_error(400);
+
+	if (allowed_method(method, sizeof(method)) == -1)
+		http_error(405);
+
 	if (fetch_page(path, &t, &p) == -1)
 		http_error(404);
 	if (read_template(&t) == -1)

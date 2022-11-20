@@ -49,6 +49,18 @@ int cgi_method(char *method, int len)
 }
 
 
+int allowed_method(char *method, int len)
+{
+	char methods[2][8] = { "GET", "HEAD" };
+
+	for (int i=0; i<2; i++) {
+		if (strncmp(method, methods[i], len) == 0)
+			return 0;
+	}
+	return -1;
+}
+
+
 void
 http_error(int http_code)
 {
