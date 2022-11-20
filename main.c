@@ -25,15 +25,12 @@
 int
 main(void)
 {
-	struct template t;
-	struct page p;
+	struct template t = {0};
+	struct page p = {0};
 
 	char path[1024];
 	char method[8];
 	char modified[32];
-
-	if (pledge("stdio rpath flock unveil", NULL) == -1)
-		err(1, "pledge");
 
 	if (unveil("./tpls", "r") == -1)
 		err(1, "unveil ./tpls");
@@ -41,6 +38,9 @@ main(void)
 		err(1, "unveil ./main.db");
 	if (unveil(NULL, NULL) == -1)
 		err(1, "unveil");
+
+	if (pledge("stdio rpath flock", NULL) == -1)
+		err(1, "pledge");
 
 	if (cgi_path(path, sizeof(path)) == -1)
 		http_error(400);
