@@ -279,11 +279,13 @@ include_tag(char **body, size_t *len, char *tag_start, char *tag_end)
 	char tag[64];
 	char tpl[32];
 	struct template t;
-	int i;
+	size_t i;
+	size_t tag_start_len;
 
+	tag_start_len=strlen(tag_start);
 	while ((inc = strstr(*body, tag_start)) != NULL) {
-		inc += 11;
-		for (i=0; inc[i] != '\'' && inc[i] != '\0' && i<32; i++) {
+		inc += tag_start_len;
+		for (i=0; inc[i] != '\'' && inc[i] != '\0' && i<sizeof(tpl); i++) {
 			tpl[i] = inc[i];
 		}
 		tpl[i] = '\0';
