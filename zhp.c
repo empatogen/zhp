@@ -29,12 +29,23 @@
 int cgi_path(char *path, int len)
 {
 	char *env;
+	int plen, ret=0;
 
 	if ((env = getenv("PATH_INFO")) == NULL)
 		return -1;
 
-	snprintf(path, len, "%s", env);
-	return 0;
+	plen = snprintf(path, len, "%s", env);
+	if (plen == 1)
+		return 0;
+
+	for (plen--; plen>0; plen--) {
+		if (path[plen] != '/')
+			break;
+		path[plen] = '\0';
+		ret=1;
+	}
+	return ret;
+}
 }
 
 
@@ -87,6 +98,16 @@ http_error(int http_code)
 			printf("<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>");
 	}
 	exit(1);
+}
+
+
+void
+http_redirect(char *path)
+{
+	printf("Status: 301 Moved Permanently\r\n");
+	printf("Content-type: text/html\r\n");
+	printf("Location: %s\r\n\r\n", path);
+	exit(0);
 }
 
 

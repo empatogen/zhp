@@ -31,6 +31,7 @@ main(void)
 	char path[1024];
 	char method[8];
 	char modified[32];
+	int redirect;
 
 	if (unveil("./tpls", "r") == -1)
 		err(1, "unveil ./tpls");
@@ -42,13 +43,15 @@ main(void)
 	if (pledge("stdio rpath flock", NULL) == -1)
 		err(1, "pledge");
 
-	if (cgi_path(path, sizeof(path)) == -1)
-		http_error(400);
 	if (cgi_method(method, sizeof(method)) == -1)
 		http_error(400);
-
 	if (allowed_method(method, sizeof(method)) == -1)
 		http_error(405);
+
+	if ((redirect = cgi_path(path, sizeof(path))) == -1)
+		http_error(400);
+	if (redirect)
+		http_redirect(path);
 
 	if (fetch_page(path, &t, &p) == -1)
 		http_error(404);
