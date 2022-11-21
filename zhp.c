@@ -46,6 +46,21 @@ int cgi_path(char *path, int len)
 	}
 	return ret;
 }
+
+
+void strip_prefix(char *path, int len)
+{
+	int i;
+
+	if (len == 0)
+		return;
+	for (i=0; path[len] != '\0'; i++, len++)
+		path[i] = path[len];
+	path[i] = '\0';
+	if (i == 0) {
+		path[0] = '/';
+		path[1] = '\0';
+	}
 }
 
 

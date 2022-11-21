@@ -52,6 +52,7 @@ int allowed_method(char *, int len);
 void http_error(int);
 void http_redirect(char *);
 void response_headers(char *);
+void strip_prefix(char *, int);
 int fetch_page(char *, struct template *, struct page *);
 int read_template(struct template *);
 int str_replace(char **, size_t *, char *, char *);

@@ -28,9 +28,10 @@ main(void)
 	struct template t = {0};
 	struct page p = {0};
 
-	char path[1024];
 	char method[8];
 	char modified[32];
+	char path[1024];
+	char prefix[] = "\0";
 	int redirect;
 
 	if (unveil("./tpls", "r") == -1)
@@ -52,6 +53,9 @@ main(void)
 		http_error(400);
 	if (redirect)
 		http_redirect(path);
+
+	if (prefix[0] != '\0')
+		strip_prefix(path, strlen(prefix));
 
 	if (fetch_page(path, &t, &p) == -1)
 		http_error(404);
