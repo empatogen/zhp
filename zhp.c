@@ -26,7 +26,8 @@
 
 #include "zhp.h"
 
-int cgi_path(char *path, int len)
+int
+cgi_path(char *path, int len)
 {
 	char *env;
 	int plen, ret=0;
@@ -48,7 +49,8 @@ int cgi_path(char *path, int len)
 }
 
 
-void strip_prefix(char *path, int len)
+void
+strip_prefix(char *path, int len)
 {
 	int i;
 
@@ -64,7 +66,8 @@ void strip_prefix(char *path, int len)
 }
 
 
-int cgi_method(char *method, int len)
+int
+cgi_method(char *method, int len)
 {
 	char *env;
 
@@ -76,7 +79,8 @@ int cgi_method(char *method, int len)
 }
 
 
-int allowed_method(char *method, int len)
+int
+allowed_method(char *method, int len)
 {
 	char methods[2][8] = { "GET", "HEAD" };
 
@@ -268,7 +272,8 @@ read_template(struct template *t)
 }
 
 
-int include_tag(char **body, size_t *len, char *tag_start, char *tag_end)
+int
+include_tag(char **body, size_t *len, char *tag_start, char *tag_end)
 {
 	char *inc;
 	char tag[64];
