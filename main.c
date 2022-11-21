@@ -59,6 +59,8 @@ main(void)
 
 	if (fetch_page(path, &t, &p) == -1)
 		http_error(404);
+	http_modified_since(&p);
+
 	if (read_template(&t) == -1)
 		http_error(404);
 

@@ -51,6 +51,7 @@ int cgi_method(char *, int len);
 int allowed_method(char *, int len);
 void http_error(int);
 void http_redirect(char *);
+void http_modified_since(struct page *);
 void response_headers(char *);
 void strip_prefix(char *, int);
 int fetch_page(char *, struct template *, struct page *);

@@ -117,6 +117,28 @@ http_error(int http_code)
 
 
 void
+http_modified_since(struct page *p)
+{
+	char *env;
+	struct tm tm;
+
+	memset(&tm, 0, sizeof(struct tm));
+
+	if ((env = getenv("HTTP_IF_MODIFIED_SINCE")) == NULL)
+		return;
+
+	if (strptime(env, "%a, %d %h %Y %T %Z", &tm) == NULL)
+		return;
+
+	if (timegm(&tm) < p->modified)
+		return;
+
+	printf("Status: 304 Not Modified\r\n\r\n");
+	exit(0);
+}
+
+
+void
 http_redirect(char *path)
 {
 	printf("Status: 301 Moved Permanently\r\n");
