@@ -108,11 +108,11 @@ http_error(int http_code)
 			printf("<!DOCTYPE html><html><body><h1>405 Method Not Allowed</h1></body></html>");
 			break;
 		default:
-			printf("Status: 500 'Internal Server Error'\r\n");
+			printf("Status: 500 Internal Server Error\r\n");
 			printf("Content-type: text/html\r\n\r\n");
 			printf("<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>");
 	}
-	exit(1);
+	exit(0);
 }
 
 
